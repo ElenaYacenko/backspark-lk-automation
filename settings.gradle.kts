@@ -1,0 +1,1 @@
+rootProject.name = "backspark-lk-automation"

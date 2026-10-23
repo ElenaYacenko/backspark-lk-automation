@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Empty Devices Response Schema",
+  "description": "Схема ответа при отсутствии приборов учёта у ЛС",
+  "type": "object",
+  "required": ["number", "core_devices"],
+  "additionalProperties": false,
+  "properties": {
+    "number": {
+      "type": "string",
+      "description": "Номер ЛС (пустая строка, если ПУ нет)",
+      "minLength": 0
+    },
+    "core_devices": {
+      "type": "null",
+      "description": "Должен быть строго null, если у ЛС нет ПУ"
+    }
+  }
+}

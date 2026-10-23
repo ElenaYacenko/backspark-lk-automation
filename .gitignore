@@ -1,0 +1,32 @@
+@"
+# Бинарники
+*.apk
+*.aab
+src/test/resources/apps/
+
+# Секреты
+src/test/resources/config/secret.properties
+**/secret.properties
+
+# Сборка
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+.kotlin/
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.gigacode/
+
+# OS
+.DS_Store
+Thumbs.db
+"@ | Out-File -FilePath .gitignore -Encoding utf8

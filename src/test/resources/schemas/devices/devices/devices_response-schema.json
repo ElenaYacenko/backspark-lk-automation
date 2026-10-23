@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["number", "core_devices"],
+  "properties": {
+    "number": {
+      "type": "string",
+      "description": "Номер лицевого счёта"
+    },
+    "core_devices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id_meter",
+          "device_title",
+          "start_day",
+          "end_day",
+          "modification",
+          "serial_number",
+          "date_check",
+          "date_check_next",
+          "type_locality",
+          "locality",
+          "type_street",
+          "street",
+          "type_house",
+          "house",
+          "building",
+          "condos_types",
+          "condos_number",
+          "meters"
+        ],
+        "properties": {
+          "id_meter": {
+            "type": "integer"
+          },
+          "device_title": {
+            "type": "string"
+          },
+          "start_day": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 31
+          },
+          "end_day": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 31
+          },
+          "modification": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "date_check": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "date_check_next": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "placement": {
+            "type": ["string", "null"]
+          },
+          "type_locality": {
+            "type": "string"
+          },
+          "locality": {
+            "type": "string"
+          },
+          "type_street": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "type_house": {
+            "type": "string"
+          },
+          "house": {
+            "type": "string"
+          },
+          "building": {
+            "type": "string"
+          },
+          "condos_types": {
+            "type": "string"
+          },
+          "condos_number": {
+            "type": "string"
+          },
+          "meters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id_indication",
+                "id_tariff",
+                "title",
+                "cost",
+                "title_unit",
+                "reading",
+                "date_reading",
+                "current_month_reading_value",
+                "current_month_reading_date"
+              ],
+              "properties": {
+                "id_indication": {
+                  "type": "integer"
+                },
+                "id_tariff": {
+                  "type": "integer"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "cost": {
+                  "type": "number"
+                },
+                "title_unit": {
+                  "type": "string"
+                },
+                "reading": {
+                  "type": "integer"
+                },
+                "date_reading": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "current_month_reading_value": {
+                  "type": ["number", "null"]
+                },
+                "current_month_reading_date": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "All Meters History Response",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id_device", "serial_number", "number", "device_type_title", "modification", "meters"],
+    "properties": {
+      "id_device": { "type": "integer" },
+      "serial_number": { "type": "string" },
+      "number": { "type": "string" },
+      "device_type_title": { "type": "string" },
+      "modification": { "type": "string" },
+      "meters": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "id_receiving_method", "id_tariff", "id_indication", "id_reading_status",
+            "reading", "title_receiving", "title_reading_status", "title_unit",
+            "tariff_title", "reading_date"
+          ],
+          "properties": {
+            "id_receiving_method": { "type": "integer" },
+            "id_tariff": { "type": "integer" },
+            "id_indication": { "type": "integer" },
+            "id_reading_status": { "type": "integer" },
+            "reading": {
+              "type": "number",
+              "minimum": 0
+            },
+            "title_receiving": { "type": "string" },
+            "title_reading_status": { "type": "string" },
+            "title_unit": { "type": "string" },
+            "tariff_title": { "type": "string" },
+            "reading_date": { "type": "string", "format": "date-time" }
+          }
+        }
+      }
+    }
+  }
+}

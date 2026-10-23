@@ -130,8 +130,8 @@ src/test/resources/
 ### Клонирование и сборка
 
 ```bash
-git clone https://github.com/<your-username>/chsk-lk-automation.git
-cd chsk-lk-automation
+git clone https://github.com/ElenaYacenko/backspark-lk-automation.git
+cd backspark-lk-automation
 ./gradlew clean build -x test
 
 ```

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
-import base.TestBase;
+import base.UiTestBase;
 import extensions.WithLogin;
 import utils.AuthContext;
 
@@ -22,7 +22,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Feature("Авторизация")
 @Story("Вход в систему")
 @Owner("Elena Yatsenko")
-public class WebSmokeTest extends TestBase {
+public class WebSmokeTest extends UiTestBase {
 
     @Test
     @DisplayName("TC-SMOKE-001: Успешная авторизация валидного пользователя")

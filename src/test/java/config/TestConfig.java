@@ -17,11 +17,11 @@ public class TestConfig {
     public interface AppConfig extends Config {
 
         @Key("baseUrl")
-        @DefaultValue("https://lknew")
+        @DefaultValue("https://lknew.ch-sk.ru")
         String getBaseUrl();
 
         @Key("apiUrl")
-        @DefaultValue("https://lknew")
+        @DefaultValue("https://lknew.ch-sk.ru")
         String getApiUrl();
 
         @Key("apiDBUrl")

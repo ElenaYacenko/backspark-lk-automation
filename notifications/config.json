@@ -1,0 +1,17 @@
+{
+  "base": {
+    "project": "${JOB_BASE_NAME}",
+    "environment": "${ENVIRONMENT}",
+    "comment": "comment here @name_elena_ya",
+    "reportLink": "${BUILD_URL}",
+    "language": "en",
+    "allureFolder": "allure-report/",
+    "allureResultsFolder": "build/allure-results",
+    "enableChart": true
+  },
+  "telegram": {
+    "token": "8669993973:AAGVHymaTQ1QV5lB3SKvuJuLfZ_MWkXkqKo",
+    "chat": "-1003810111047",
+    "replyTo": ""
+  }
+}

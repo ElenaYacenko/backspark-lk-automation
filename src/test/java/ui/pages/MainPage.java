@@ -22,7 +22,7 @@ public class MainPage {
     // Действия
     @Step("UI: Открыть главную страницу")
     public MainPage openMainPage(){
-        open("/home");
+        open(HOME);
         return this;
     }
 

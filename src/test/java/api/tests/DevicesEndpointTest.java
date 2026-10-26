@@ -3,7 +3,7 @@ package api.tests;
 import api.helpers.DevicesResponseHelper;
 import api.models.devices.DevicesResponseModel;
 import api.models.login.LoginBodyModel;
-import base.TestBase;
+import base.ApiTestBase;
 import config.TestConfig;
 import io.qameta.allure.*;
 import io.restassured.response.Response;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Epic("Приборы учёта")
 @Feature("Получение информации о ПУ")
 @Owner("Elena Yatsenko")
-public class DevicesEndpointTest extends TestBase {
+public class DevicesEndpointTest extends ApiTestBase {
     private String token;
 
     @BeforeEach

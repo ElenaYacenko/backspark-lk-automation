@@ -11,13 +11,14 @@ import utils.AuthContext;
 
 import static com.codeborne.selenide.Selenide.localStorage;
 import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 
 public class LoginExtension implements BeforeEachCallback {
     ApiClient api = new ApiClient();
 
     @Override
     @Step("[UI] Открытие страницы с существующим пользователем")
-    public void beforeEach (ExtensionContext context){
+    public void beforeEach(ExtensionContext context) {
         LoginBodyModel loginData = new LoginBodyModel(
                 TestConfig.getTestUserPhone(),
                 TestConfig.getTestUserPassword()
@@ -28,8 +29,19 @@ public class LoginExtension implements BeforeEachCallback {
         // Сохраняем токен + userId для доступа из теста
         AuthContext.setToken(token);
 
-        LocalStorageAuthModel authBody = new LocalStorageAuthModel(token,token);
+        LocalStorageAuthModel authBody = new LocalStorageAuthModel(token, token);
+        String jsonPayload = authBody.toJson();
+
+        // 🔍 ОТЛАДКА 1: Проверяем, что именно мы пытаемся записать
+        System.out.println("==================================================");
+        System.out.println("🔍 DEBUG: Проверка payload ПЕРЕД записью в localStorage");
+        System.out.println("JSON строка: " + jsonPayload);
+        if (jsonPayload == null || jsonPayload.isEmpty() || jsonPayload.equals("{}")) {
+            System.out.println("❌ ВНИМАНИЕ: JSON пустой или невалидный! Проверь метод toJson()");
+        }
+        System.out.println("==================================================");
         openFaviconAndSetLocalStorage("auth-tokens-production", authBody.toJson());
+        debugLocalStorage();
     }
 
     @Step("[UI] Открытие /favicon.ico и установка данных в localstorage")
@@ -48,10 +60,22 @@ public class LoginExtension implements BeforeEachCallback {
         open("/favicon.ico");
     }
 
-    @Step("[UI] Отладка: что в localStorage")
+    @Step("[UI] Отладка: проверка содержимого localStorage")
     public void debugLocalStorage() {
-        System.out.println("LocalStorage keys: " + localStorage().getItems());
-        System.out.println("auth-tokens-production: " + localStorage().getItem("auth-tokens-production"));
+        System.out.println("==================================================");
+        System.out.println("🔍 LOCALSTORAGE DEBUG (ПОСЛЕ записи)");
+        System.out.println("1. Текущий URL: " + getWebDriver().getCurrentUrl());
+        System.out.println("2. Все ключи в LS: " + localStorage().getItems());
+
+        String savedValue = localStorage().getItem("auth-tokens-production");
+        System.out.println("3. Значение 'auth-tokens-production': " + savedValue);
+
+        if (savedValue == null || savedValue.isEmpty()) {
+            System.out.println("❌ ОШИБКА: Токен НЕ сохранен в localStorage! Фронтенд сделает редирект на логин.");
+        } else {
+            System.out.println("✅ УСПЕХ: Токен успешно сохранен в localStorage.");
+        }
+        System.out.println("==================================================");
     }
 }
 

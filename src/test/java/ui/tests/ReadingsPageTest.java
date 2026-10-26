@@ -1,6 +1,6 @@
 package ui.tests;
 
-import base.TestBase;
+import base.UiTestBase;
 import extensions.WithLogin;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
@@ -15,7 +15,7 @@ import static io.qameta.allure.Allure.step;
 @Story("Страница передачи показаний")
 @Owner("Elena Yatsenko")
 
-public class ReadingsPageTest extends TestBase {
+public class ReadingsPageTest extends UiTestBase {
     public static final String READING_PERIOD_INFO = "Передача показаний возможна с 1 по 25 число включительно";
     public static final String READINGS_ERROR_MESSAGE = "Ваши показания меньше предыдущих";
 
@@ -104,6 +104,7 @@ public class ReadingsPageTest extends TestBase {
     }
 
     @Test
+    @Disabled("Временно отключен чтобы не засорять БД")
     @DisplayName("UI-READING-004: Успешная передача показаний")
     @Description("""
             Цель: Проверить успешную передачу новых показаний.

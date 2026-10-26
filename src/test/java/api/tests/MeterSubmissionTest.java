@@ -4,7 +4,7 @@ import api.helpers.MeterTestHelper;
 import api.models.allMeters.AllMetersResponseModel;
 import api.models.login.LoginBodyModel;
 import api.models.meter.MeterBodyModel;
-import base.TestBase;
+import base.ApiTestBase;
 import base.TestData;
 import config.TestConfig;
 import io.qameta.allure.*;
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Feature("Передача показаний")
 @Owner("Elena Yatsenko")
 
-public class MeterSubmissionTest extends TestBase {
+public class MeterSubmissionTest extends ApiTestBase {
 
     private String token;
 

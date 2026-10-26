@@ -2,7 +2,7 @@ package ui.tests;
 
 import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
-import base.TestBase;
+import base.UiTestBase;
 import extensions.WithLogin;
 
 import static io.qameta.allure.Allure.step;
@@ -11,7 +11,7 @@ import static io.qameta.allure.Allure.step;
 @Feature("Шапка приложения (Header)")
 @Story("Навигация по основному меню и интерактивные элементы")
 @Owner("Elena Yatsenko")
-public class HeaderAndNavigationTest extends TestBase {
+public class HeaderAndNavigationTest extends UiTestBase {
 
     @BeforeEach
     void setUpHeaderTests() {

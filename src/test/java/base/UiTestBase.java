@@ -1,30 +1,30 @@
 package base;
 
 import allure.Attach;
-import api.apiClients.ApiClient;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import config.TestConfig;
 import io.qameta.allure.selenide.AllureSelenide;
-import io.restassured.RestAssured;
-import io.restassured.filter.Filter;
-import mobile.drivers.AndroidDriverProvider;
-import mobile.screen.LoginScreen;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import ui.components.AccountsSidebarComponent;
 import ui.components.HeaderComponent;
 import ui.components.UnifiedAccountsSidebarComponent;
 import ui.pages.*;
-import utils.AccountDataHelper;
 
 import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.Selenide.webdriver;
 
-public class TestBase {
-    protected static final ApiClient api = new ApiClient();
+/**
+ * Базовый класс для UI-тестов.
+**/
+public class UiTestBase extends ApiTestBase {
 
+    static {
+        Configuration.baseUrl = TestConfig.getBaseUrl();
+    }
+
+    // Page Objects
     protected final LoginPage loginPage = new LoginPage();
     protected final MainPage mainPage = new MainPage();
     protected final BasePage basePage = new BasePage();
@@ -33,44 +33,26 @@ public class TestBase {
     protected final PaymentPage paymentPage = new PaymentPage();
     protected final ReadingsPage readingsPage = new ReadingsPage();
 
+    // Components
     protected final HeaderComponent headerComponent = new HeaderComponent();
     protected final AccountsSidebarComponent accountsSidebarComponent = new AccountsSidebarComponent();
     protected final UnifiedAccountsSidebarComponent unifiedAccountsSidebarComponent = new UnifiedAccountsSidebarComponent();
 
-    protected final AccountDataHelper accountDataHelper = new AccountDataHelper(api);
-
-    private static final long API_DELAY_MS = 2000;
-
-    @BeforeAll
-    public static void setUp() {
-        // Настройка Selenide
-        Configuration.baseUrl = TestConfig.getBaseUrl();
-        Configuration.browser = System.getProperty("browser", "chrome");
-        Configuration.browserSize = "1920x1080";
-        Configuration.timeout = 10000;
-
-        // Настройка RestAssured
-        RestAssured.baseURI = TestConfig.getApiUrl();
-        RestAssured.basePath = TestConfig.getBasePath();
-
-        RestAssured.filters((Filter) (requestSpec, responseSpec, ctx) -> {
-            try {
-                Thread.sleep(API_DELAY_MS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            return ctx.next(requestSpec, responseSpec);
-        });
-
-    }
+    private static final String LISTENER_NAME = "AllureSelenide";
 
     @BeforeEach
-    void addListener() {
-        SelenideLogger.addListener("AllureSelenide", new AllureSelenide().savePageSource(true).screenshots(true));
+    void setUpUi() {
+        Configuration.browser = System.getProperty("browser", "chrome");
+        Configuration.browserSize = "1920x1080";
+        Configuration.timeout = 20000;
+
+        SelenideLogger.addListener(LISTENER_NAME, new AllureSelenide()
+                .savePageSource(true)
+                .screenshots(true));
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDownUi() {
         try {
             if (webdriver().driver().hasWebDriverStarted()) {
                 Attach.screenshotAs("Last screenshot");
@@ -84,7 +66,7 @@ public class TestBase {
             if (webdriver().driver().hasWebDriverStarted()) {
                 closeWebDriver();
             }
-            SelenideLogger.removeListener("AllureSelenide");
+            SelenideLogger.removeListener(LISTENER_NAME);
         }
     }
 }

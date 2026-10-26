@@ -1,10 +1,9 @@
 package api.tests;
 
 import api.helpers.AllMetersHelper;
-import api.models.allMeters.AllMetersResponseModel;
 import api.models.allMeters.ErrorResponseModel;
 import api.models.login.LoginBodyModel;
-import base.TestBase;
+import base.ApiTestBase;
 import base.TestData;
 import config.TestConfig;
 import io.qameta.allure.*;
@@ -23,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Epic("Показания")
 @Feature("Получение информации о показаниях")
 @Owner("Elena Yatsenko")
-public class AllMetersEndpointTest extends TestBase {
+public class AllMetersEndpointTest extends ApiTestBase {
 
     private String token;
 

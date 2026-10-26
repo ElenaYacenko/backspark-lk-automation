@@ -1,0 +1,64 @@
+name: Test
+
+on: workflow_dispatch
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    # где запускаем
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Выкачиваем репозиторий
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Настраиваем Java
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      # 3. Запускаем Selenoid
+      - name: Start Selenoid
+        uses: Xotabu4/selenoid-github-action@v2
+
+      # 4. Даём права на выполнение (важно для Linux!)
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 5. Запускаем тесты
+      - name: Run tests
+        run: ./gradlew clean test -Dselenide.remote=http://localhost:4444/wd/hub
+
+      # 6. Скачиваем историю тестов
+      - name: Download previous report history
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      # 7. Генерируем отчет
+      - name: Generate Allure report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          gh_pages: gh-pages
+          allure_results: build/allure-results
+          allure_report: allure-report
+          allure_history: allure-history
+
+      # 8. Публикуем отчет (исправлены отступы!)
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: allure-history
+          keep_files: true

@@ -9,7 +9,6 @@ permissions:
 
 jobs:
   test:
-    # где запускаем
     runs-on: ubuntu-latest
     steps:
       # 1. Выкачиваем репозиторий

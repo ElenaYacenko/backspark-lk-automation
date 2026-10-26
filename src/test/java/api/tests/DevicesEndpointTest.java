@@ -1,21 +1,26 @@
 package api.tests;
 
+import api.helpers.DevicesResponseHelper;
+import api.models.devices.DevicesResponseModel;
+import api.models.login.LoginBodyModel;
 import base.TestBase;
 import config.TestConfig;
 import io.qameta.allure.*;
 import io.restassured.response.Response;
-import api.models.devices.DevicesResponseModel;
-import api.models.login.LoginBodyModel;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.stream.Stream;
+
+import static base.TestData.*;
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
-import static base.TestData.*;
 
 @Epic("Приборы учёта")
 @Feature("Получение информации о ПУ")
 @Owner("Elena Yatsenko")
-
 public class DevicesEndpointTest extends TestBase {
     private String token;
 
@@ -28,8 +33,9 @@ public class DevicesEndpointTest extends TestBase {
         token = api.auth.loginAndGetToken(loginData);
     }
 
-    @Test
-    @DisplayName("Получение информации о ПУ, однотарифный счетчик")
+    @ParameterizedTest(name = "ПУ={0}, тарифы: {1}")
+    @MethodSource("singleMeterTariffScenarios")
+    @DisplayName("Получение информации о ПУ с фиксированным набором тарифов")
     @Description("""
             Цель: Проверка получения корректной информации о ПУ, его тарифов и показаниях.
             Дано: ЛС с однотарифным ПУ.
@@ -38,99 +44,16 @@ public class DevicesEndpointTest extends TestBase {
             """)
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
     @Severity(SeverityLevel.CRITICAL)
-    void shouldReturnSingleTariffForValidAccount() {
-
-        DevicesResponseModel response = api.devices.userDevicesInfo(token, SINGLE_TARIFF_METER);
-
-        step("Проверка схемы ответа, в ответе тариф 'Сутки'", () -> {
-            assertThat(response.coreDevices())
-                    .as("Должен быть хотя бы один прибор учёта")
-                    .isNotEmpty();
-
-            assertThat(response.coreDevices().get(0).meters())
-                    .as("Должен быть хотя бы один тариф")
-                    .isNotEmpty();
-
-            assertThat(response.coreDevices().get(0).meters().get(0).title())
-                    .as("Название тарифа должно быть 'Сутки'")
-                    .isEqualTo("Сутки");
-        });
-    }
-
-    @Test
-    @DisplayName("Получение информации о ПУ, двутарифный счетчик")
-    @Description("""
-            Цель: Проверка получения корректной информации о двутарифном ПУ, его тарифов и показаниях.
-            Дано: ЛС с двутарифным ПУ.
-            Когда: Отправлен GET запрос на эндпоинт meters/devices.
-            Тогда: HTTP статус 200, у прибора ровно 2 тарифа: 'День' и 'Ночь'.
-            """)
-    @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
-    @Severity(SeverityLevel.CRITICAL)
-    void shouldReturnTwoTariffsForDualTariffMeter() {
-
-        DevicesResponseModel response = api.devices.userDevicesInfo(token, TWO_TARIFF_METER);
+    void shouldReturnCorrectTariffsForMeter(int meterId, String[] expectedTariffs) {
+        DevicesResponseModel response = api.devices.userDevicesInfo(token, meterId);
 
         step("Проверка базовой структуры ответа", () -> {
-            assertThat(response.coreDevices())
-                    .as("Должен быть ровно 1 прибор учёта в ответе")
-                    .hasSize(1);
+            DevicesResponseHelper.assertHasAtLeastOneDevice(response);
+            DevicesResponseHelper.assertFirstDeviceHasExactlyNMeters(response, expectedTariffs.length);
         });
-        step("Проверка наличия двух тарифов 'День' и 'Ночь'", () -> {
-            var meters = response.coreDevices().get(0).meters();
-
-            assertThat(meters)
-                    .as("У прибора должно быть ровно 2 тарифа")
-                    .hasSize(2);
-
-            assertThat(meters.get(0).title())
-                    .as("Название первого тарифа")
-                    .isEqualTo("День");
-
-            assertThat(meters.get(1).title())
-                    .as("Название второго тарифа")
-                    .isEqualTo("Ночь");
-        });
-    }
-
-    @Test
-    @DisplayName("Получение информации о ПУ, трехтарифный счетчик")
-    @Description("""
-            Цель: Проверка получения корректной информации о трехтарифном ПУ, его тарифов и показаниях.
-            Дано: ЛС с трехтарифным ПУ.
-            Когда: Отправлен GET запрос на эндпоинт meters/devices.
-            Тогда: HTTP статус 200, у прибора ровно 3 тарифа: 'Пик', 'Полупик' и 'Ночь'.
-            """)
-    @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
-    @Severity(SeverityLevel.CRITICAL)
-    void shouldReturnThreeTariffsForTripleTariffMeter() {
-
-        DevicesResponseModel response = api.devices.userDevicesInfo(token, THREE_TARIFF_METER);
-
-        step("Проверка базовой структуры ответа", () -> {
-            assertThat(response.coreDevices())
-                    .as("Должен быть ровно 1 прибор учёта в ответе")
-                    .hasSize(1);
-        });
-        step("Проверка наличия трех тарифов 'Пик', 'Полупик' и 'Ночь'", () -> {
-            var meters = response.coreDevices().get(0).meters();
-
-            assertThat(meters)
-                    .as("У прибора должно быть ровно 3 тарифа")
-                    .hasSize(3);
-
-            assertThat(meters.get(0).title())
-                    .as("Название первого тарифа")
-                    .isEqualTo("Пик");
-
-            assertThat(meters.get(1).title())
-                    .as("Название второго тарифа")
-                    .isEqualTo("Полупик");
-
-            assertThat(meters.get(2).title())
-                    .as("Название третьего тарифа")
-                    .isEqualTo("Ночь");
-        });
+        step("Проверка названий тарифов", () ->
+                DevicesResponseHelper.assertFirstDeviceHasMetersWithTitleInOrder(response, expectedTariffs)
+        );
     }
 
     @Test
@@ -144,20 +67,13 @@ public class DevicesEndpointTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldReturnWaterMeterDevicesForValidAccount() {
-
         DevicesResponseModel response = api.devices.userDevicesInfo(token, WATER_METER);
 
-        step("Проверка наличия приборов учёта", () -> {
-            assertThat(response.coreDevices())
-                    .as("Список приборов учёта не должен быть пустым")
-                    .isNotEmpty();
-        });
+        step("Проверка наличия приборов учёта", () ->
+                DevicesResponseHelper.assertHasAtLeastOneDevice(response));
 
-        step("Проверка целостности данных по всем тарифам", () -> {
-            assertThat(response.coreDevices())
-                    .as("У каждого прибора должен быть список тарифов")
-                    .allSatisfy(device -> assertThat(device.meters()).isNotEmpty());
-        });
+        step("Проверка целостности данных по всем тарифам", () ->
+                DevicesResponseHelper.assertAllDevicesHaveMeters(response));
     }
 
     @Test
@@ -171,18 +87,10 @@ public class DevicesEndpointTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldReturn401WhenAccountNotLinkedToLkk() {
-
         DevicesResponseModel response = api.devices.userEmptyDevicesInfo(token, EMPTY_METER);
 
-        step("Проверка содержимого ответа", () -> {
-            assertThat(response.number())
-                    .as("Номер ЛС должен быть пустой строкой")
-                    .isEqualTo("");
-
-            assertThat(response.coreDevices())
-                    .as("Список приборов учёта должен быть null")
-                    .isNull();
-        });
+        step("Проверка содержимого ответа", () ->
+                DevicesResponseHelper.assertEmptyDevicesStructure(response));
     }
 
     @Test
@@ -197,7 +105,6 @@ public class DevicesEndpointTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("negative")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldReturn401WhenAccountNotLinkedToLKK() {
-
         Response response = api.devices.accountNotInLKK(token, OTHER_USER_ACCOUNT);
 
         step("Проверка статуса и структуры ответа", () -> {
@@ -222,7 +129,6 @@ public class DevicesEndpointTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("negative")})
     @Severity(SeverityLevel.NORMAL)
     void shouldReturn404WhenIdPaIsMissing() {
-
         Response response = api.devices.errorMissingParameter(token);
 
         step("Проверка статуса и структуры ответа", () -> {
@@ -230,5 +136,13 @@ public class DevicesEndpointTest extends TestBase {
                     .as("HTTP статус должен быть 404")
                     .isEqualTo(404);
         });
+    }
+
+    static Stream<Arguments> singleMeterTariffScenarios() {
+        return Stream.of(
+                Arguments.of(SINGLE_TARIFF_METER, new String[]{"Сутки"}),
+                Arguments.of(TWO_TARIFF_METER, new String[]{"День", "Ночь"}),
+                Arguments.of(THREE_TARIFF_METER, new String[]{"Пик", "Полупик", "Ночь"})
+        );
     }
 }

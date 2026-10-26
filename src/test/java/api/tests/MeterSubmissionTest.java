@@ -1,12 +1,13 @@
 package api.tests;
 
-import base.TestBase;
-import config.TestConfig;
-import io.qameta.allure.*;
+import api.helpers.MeterTestHelper;
 import api.models.allMeters.AllMetersResponseModel;
 import api.models.login.LoginBodyModel;
 import api.models.meter.MeterBodyModel;
-import api.models.userAccount.UsersAccountResponseModel;
+import base.TestBase;
+import base.TestData;
+import config.TestConfig;
+import io.qameta.allure.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -17,7 +18,6 @@ import java.util.stream.Stream;
 
 import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
-import static base.TestData.*;
 
 @Epic("Показания")
 @Feature("Передача показаний")
@@ -25,18 +25,10 @@ import static base.TestData.*;
 
 public class MeterSubmissionTest extends TestBase {
 
-    public static final String INVALID_READINGS_ERROR_MESSAGE =
-            "Ошибка сохранения показания. Проверьте корректность переданных данных.";
-    public static final String SUCCESS_SUBMISSION_MESSAGE = "Показания переданы успешно";
-    public static final Long READING_INCREMENT = 10L;
-    public static final Integer VALID_RECEIVING_METHOD = 41; // ЛКК
-
-
-
     private String token;
 
     @BeforeEach
-     void login() {
+    void login() {
         LoginBodyModel loginData = new LoginBodyModel(
                 TestConfig.getTestUserPhone(),
                 TestConfig.getTestUserPassword()
@@ -55,41 +47,17 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldSuccessfullySubmitMeterReadings() {
-        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний для подготовки данных",
-                () -> api.allMeters.getDeviceReadingsHistory(token, SINGLE_TARIFF_METER));
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter firstMeter = step("Извлечение данных первого тарифа",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
-        Long newReading = step("Расчет новых показаний", () -> firstMeter.reading() + READING_INCREMENT
-        );
+        MeterTestHelper.MeterData meterData = step("Получение данных ПУ",
+                () -> MeterTestHelper.extractFirstMeterData(token, TestData.SINGLE_TARIFF_METER));
 
-        MeterBodyModel requestBody = step("Формирование тела запроса", () -> new MeterBodyModel(
-                        firstRecord.idDevice(),
-                        VALID_RECEIVING_METHOD,
-                        List.of(new MeterBodyModel.Rate(
-                                firstMeter.idTariff(),
-                                newReading,
-                                firstMeter.idIndication()
-                        ))
-                )
-        );
+        Long newReading = meterData.reading() + TestData.READING_INCREMENT;
+        MeterBodyModel requestBody = step("Формирование тела запроса",
+                () -> MeterTestHelper.buildSubmissionRequest(
+                        meterData.idDevice(), meterData.idTariff(), newReading, meterData.idIndication()));
 
-        String response = step("Отправка POST-запроса на передачу показаний", () ->
-                api.meter.submitMeterReadings(token, requestBody)
-        );
-        step("Проверка успешного ответа", () -> {
-            assertThat(response)
-                    .as("Ответ API должен содержать сообщение об успехе")
-                    .isNotBlank()
-                    .contains(SUCCESS_SUBMISSION_MESSAGE);
-        });
+        String response = step("Отправка показаний",
+                () -> api.meter.submitMeterReadings(token, requestBody));
+        MeterTestHelper.assertSuccessResponse(response);
     }
 
     @Test
@@ -103,53 +71,25 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldSuccessfullySubmitTwoTariffMeterReadings() {
-        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний для подготовки данных",
-                () -> api.allMeters.getDeviceReadingsHistory(token, TWO_TARIFF_METER));
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter dayMeter = step("Извлечение данных тарифа 'День'",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
-        AllMetersResponseModel.Meter nightMeter = step("Извлечение данных тарифа 'Ночь'",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(1);
-                    return meter;
-                });
-        Long newDayReading = step("Расчет новых показаний 'День'", () -> dayMeter.reading() + READING_INCREMENT
-        );
-        Long newNightReading = step("Расчет новых показаний 'Ночь'", () -> nightMeter.reading() + READING_INCREMENT
-        );
+        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний",
+                () -> api.allMeters.getDeviceReadingsHistory(token, TestData.TWO_TARIFF_METER));
+        AllMetersResponseModel record = historyResponse.get(0);
 
-        MeterBodyModel requestBody = step("Формирование тела запроса", () -> new MeterBodyModel(
-                        firstRecord.idDevice(),
-                        VALID_RECEIVING_METHOD,
-                        List.of(
-                                new MeterBodyModel.Rate(
-                                        dayMeter.idTariff(),
-                                        newDayReading,
-                                        dayMeter.idIndication()),
-                                new MeterBodyModel.Rate(
-                                        nightMeter.idTariff(),
-                                        newNightReading,
-                                        nightMeter.idIndication()
-                                ))
-                )
-        );
+        MeterBodyModel requestBody = step("Формирование тела запроса",
+                () -> MeterTestHelper.buildMultiTariffRequest(record.idDevice(), List.of(
+                        new MeterTestHelper.RateData(
+                                record.meters().get(0).idTariff(),
+                                record.meters().get(0).reading() + TestData.READING_INCREMENT,
+                                record.meters().get(0).idIndication()),
+                        new MeterTestHelper.RateData(
+                                record.meters().get(1).idTariff(),
+                                record.meters().get(1).reading() + TestData.READING_INCREMENT,
+                                record.meters().get(1).idIndication())
+                )));
 
-        String response = step("Отправка POST-запроса на передачу показаний", () ->
-                api.meter.submitMeterReadings(token, requestBody)
-        );
-        step("Проверка успешного ответа", () -> {
-            assertThat(response)
-                    .as("Ответ API должен содержать сообщение об успехе")
-                    .isNotBlank()
-                    .contains(SUCCESS_SUBMISSION_MESSAGE);
-        });
+        String response = step("Отправка показаний",
+                () -> api.meter.submitMeterReadings(token, requestBody));
+        MeterTestHelper.assertSuccessResponse(response);
     }
 
     @Test
@@ -163,64 +103,29 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldSuccessfullySubmitThreeTariffMeterReadings() {
-        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний для подготовки данных",
-                () -> api.allMeters.getDeviceReadingsHistory(token, THREE_TARIFF_METER));
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter peakMeter = step("Извлечение данных тарифа 'Пик'",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
-        AllMetersResponseModel.Meter halfPeakMeter = step("Извлечение данных тарифа 'Полупик'",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(1);
-                    return meter;
-                });
-        AllMetersResponseModel.Meter nightMeter = step("Извлечение данных тарифа 'Ночь'",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(2);
-                    return meter;
-                });
-        Long newPeakReading = step("Расчет новых показаний 'Пик'", () -> peakMeter.reading() + READING_INCREMENT
-        );
-        Long newhalfPeakReading = step("Расчет новых показаний 'Полупик'", () -> halfPeakMeter.reading() + READING_INCREMENT
-        );
-        Long newNightReading = step("Расчет новых показаний 'Ночь'", () -> nightMeter.reading() + READING_INCREMENT
-        );
+        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний",
+                () -> api.allMeters.getDeviceReadingsHistory(token, TestData.THREE_TARIFF_METER));
+        AllMetersResponseModel record = historyResponse.get(0);
 
-        MeterBodyModel requestBody = step("Формирование тела запроса", () -> new MeterBodyModel(
-                        firstRecord.idDevice(),
-                        VALID_RECEIVING_METHOD,
-                        List.of(
-                                new MeterBodyModel.Rate(
-                                        peakMeter.idTariff(),
-                                        newPeakReading,
-                                        peakMeter.idIndication()),
-                                new MeterBodyModel.Rate(
-                                        halfPeakMeter.idTariff(),
-                                        newhalfPeakReading,
-                                        halfPeakMeter.idIndication()),
-                                new MeterBodyModel.Rate(
-                                        nightMeter.idTariff(),
-                                        newNightReading,
-                                        nightMeter.idIndication()
-                                ))
-                )
-        );
+        MeterBodyModel requestBody = step("Формирование тела запроса",
+                () -> MeterTestHelper.buildMultiTariffRequest(record.idDevice(), List.of(
+                        new MeterTestHelper.RateData(
+                                record.meters().get(0).idTariff(),
+                                record.meters().get(0).reading() + TestData.READING_INCREMENT,
+                                record.meters().get(0).idIndication()),
+                        new MeterTestHelper.RateData(
+                                record.meters().get(1).idTariff(),
+                                record.meters().get(1).reading() + TestData.READING_INCREMENT,
+                                record.meters().get(1).idIndication()),
+                        new MeterTestHelper.RateData(
+                                record.meters().get(2).idTariff(),
+                                record.meters().get(2).reading() + TestData.READING_INCREMENT,
+                                record.meters().get(2).idIndication())
+                )));
 
-        String response = step("Отправка POST-запроса на передачу показаний", () ->
-                api.meter.submitMeterReadings(token, requestBody)
-        );
-        step("Проверка успешного ответа", () -> {
-            assertThat(response)
-                    .as("Ответ API должен содержать сообщение об успехе")
-                    .isNotBlank()
-                    .contains(SUCCESS_SUBMISSION_MESSAGE);
-        });
+        String response = step("Отправка показаний",
+                () -> api.meter.submitMeterReadings(token, requestBody));
+        MeterTestHelper.assertSuccessResponse(response);
     }
 
     @Test
@@ -229,47 +134,23 @@ public class MeterSubmissionTest extends TestBase {
             Цель: Проверка успешной передачи показаний прибора учёта воды.
             Дано: Авторизованный пользователь, ЛС с ПУ по водоснабжению.
             Когда: Отправлен POST запрос на /meters/meter с корректным телом запроса.
-            Тогда: HTTP статус 200, возвращено сообщение об успешной передаче.
+            Тогда: HTTP с��атус 200, возвращено сообщение об успешной передаче.
             Примечание: Показания воды могут быть дробными (интерполяция), поэтому используется BigDecimal.
             """)
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive"), @Tag("smoke")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldSuccessfullySubmitWaterMeterReadings() {
-        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний для подготовки данных",
-                () -> api.allMeters.getDeviceReadingsHistory(token, WATER_METER));
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter firstMeter = step("Извлечение данных первого тарифа",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
-        Long newReading = step("Расчет новых показаний", () -> firstMeter.reading() + READING_INCREMENT
-        );
+        MeterTestHelper.MeterData meterData = step("Получение данных ПУ",
+                () -> MeterTestHelper.extractFirstMeterData(token, TestData.WATER_METER));
 
-        MeterBodyModel requestBody = step("Формирование тела запроса", () -> new MeterBodyModel(
-                        firstRecord.idDevice(),
-                        VALID_RECEIVING_METHOD,
-                        List.of(new MeterBodyModel.Rate(
-                                firstMeter.idTariff(),
-                                newReading,
-                                firstMeter.idIndication()
-                        ))
-                )
-        );
+        Long newReading = meterData.reading() + TestData.READING_INCREMENT;
+        MeterBodyModel requestBody = step("Формирование тела запроса",
+                () -> MeterTestHelper.buildSubmissionRequest(
+                        meterData.idDevice(), meterData.idTariff(), newReading, meterData.idIndication()));
 
-        String response = step("Отправка POST-запроса на передачу показаний", () ->
-                api.meter.submitMeterReadings(token, requestBody)
-        );
-        step("Проверка успешного ответа", () -> {
-            assertThat(response)
-                    .as("Ответ API должен содержать сообщение об успехе")
-                    .isNotBlank()
-                    .contains(SUCCESS_SUBMISSION_MESSAGE);
-        });
+        String response = step("Отправка показаний",
+                () -> api.meter.submitMeterReadings(token, requestBody));
+        MeterTestHelper.assertSuccessResponse(response);
     }
 
     @Test
@@ -284,41 +165,16 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("positive")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldSuccessfullySubmitReadingsEqualToPrevious() {
-        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний для подготовки данных",
-                () -> api.allMeters.getDeviceReadingsHistory(token, SINGLE_TARIFF_METER));
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter firstMeter = step("Извлечение данных первого тарифа",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
-        Long previousReading = firstMeter.reading();
+        MeterTestHelper.MeterData meterData = step("Получение данных ПУ",
+                () -> MeterTestHelper.extractFirstMeterData(token, TestData.SINGLE_TARIFF_METER));
 
-        MeterBodyModel requestBody = step("Формирование тела запроса с показаниями, равными предыдущим", () ->
-                new MeterBodyModel(
-                        firstRecord.idDevice(),
-                        VALID_RECEIVING_METHOD,
-                        List.of(new MeterBodyModel.Rate(
-                                firstMeter.idTariff(),
-                                previousReading,
-                                firstMeter.idIndication()
-                        ))
-                )
-        );
+        MeterBodyModel requestBody = step("Формирование тела запроса с показаниями, равными предыдущим",
+                () -> MeterTestHelper.buildSubmissionRequest(
+                        meterData.idDevice(), meterData.idTariff(), meterData.reading(), meterData.idIndication()));
 
-        String response = step("Отправка POST-запроса на передачу показаний", () ->
-                api.meter.submitMeterReadings(token, requestBody)
-        );
-        step("Проверка успешного ответа", () -> {
-            assertThat(response)
-                    .as("Ответ API должен содержать сообщение об успехе")
-                    .isNotBlank()
-                    .contains(SUCCESS_SUBMISSION_MESSAGE);
-        });
+        String response = step("Отправка показаний",
+                () -> api.meter.submitMeterReadings(token, requestBody));
+        MeterTestHelper.assertSuccessResponse(response);
     }
 
     @ParameterizedTest(name = "Показания={0}, ожидаемая ошибка={1}")
@@ -333,26 +189,16 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("negative")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldRejectInvalidReadings(String readingValue, String expectedError) {
-        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний для подготовки данных",
-                () -> api.allMeters.getDeviceReadingsHistory(token, SINGLE_TARIFF_METER));
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter firstMeter = step("Извлечение данных первого тарифа",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
+        MeterTestHelper.MeterData meterData = step("Получение данных ПУ",
+                () -> MeterTestHelper.extractFirstMeterData(token, TestData.SINGLE_TARIFF_METER));
 
         MeterBodyModel requestBody = new MeterBodyModel(
-                firstRecord.idDevice(),
-                VALID_RECEIVING_METHOD,
+                meterData.idDevice(),
+                TestData.VALID_RECEIVING_METHOD,
                 List.of(new MeterBodyModel.Rate(
-                        firstMeter.idTariff(),
+                        meterData.idTariff(),
                         Long.parseLong(readingValue),
-                        firstMeter.idIndication()
+                        meterData.idIndication()
                 ))
         );
 
@@ -389,20 +235,10 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("negative")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldRejectInvalidRequestStructure(String scenarioName, String errorName, String rawJsonBody) {
-        List<AllMetersResponseModel> historyResponse = step("Получение истории показаний для подготовки данных",
-                () -> api.allMeters.getDeviceReadingsHistory(token, SINGLE_TARIFF_METER));
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter firstMeter = step("Извлечение данных первого тарифа",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
+        MeterTestHelper.MeterData meterData = step("Получение данных ПУ",
+                () -> MeterTestHelper.extractFirstMeterData(token, TestData.SINGLE_TARIFF_METER));
 
-        String requestBody = rawJsonBody.formatted(firstRecord.idDevice(), VALID_RECEIVING_METHOD, firstMeter.idTariff());
+        String requestBody = rawJsonBody.formatted(meterData.idDevice(), TestData.VALID_RECEIVING_METHOD, meterData.idTariff());
 
         String errorResponse = step(
                 "Отправка POST-запроса со сценарием: " + scenarioName,
@@ -474,21 +310,10 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("regression"), @Tag("negative")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldRejectNonExistentIdDevice() {
+        MeterTestHelper.MeterData meterData = step("Получение данных ПУ",
+                () -> MeterTestHelper.extractFirstMeterData(token, TestData.SINGLE_TARIFF_METER));
 
         Long nonExistentIdDevice = 999999999L;
-
-        List<AllMetersResponseModel> historyResponse = api.allMeters.getDeviceReadingsHistory(token, SINGLE_TARIFF_METER);
-
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter firstMeter = step("Извлечение данных первого тарифа",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
 
         String requestBody = """
                 {
@@ -502,7 +327,7 @@ public class MeterSubmissionTest extends TestBase {
                         }
                     ]
                 }
-                """.formatted(nonExistentIdDevice, VALID_RECEIVING_METHOD, firstMeter.idTariff());
+                """.formatted(nonExistentIdDevice, TestData.VALID_RECEIVING_METHOD, meterData.idTariff());
 
         String errorResponse = step(
                 "Отправка POST-запроса с несуществующим id_device=" + nonExistentIdDevice,
@@ -513,7 +338,7 @@ public class MeterSubmissionTest extends TestBase {
             assertThat(errorResponse)
                     .as("Ответ должен содержать сообщение об ошибке")
                     .isNotBlank()
-                    .contains(INVALID_READINGS_ERROR_MESSAGE);
+                    .contains(TestData.INVALID_READINGS_ERROR_MESSAGE);
         });
     }
 
@@ -528,21 +353,10 @@ public class MeterSubmissionTest extends TestBase {
     @Tags({@Tag("api"), @Tag("negative"), @Tag("regression")})
     @Severity(SeverityLevel.CRITICAL)
     void shouldRejectNonExistentIdTariff() {
+        MeterTestHelper.MeterData meterData = step("Получение данных ПУ",
+                () -> MeterTestHelper.extractFirstMeterData(token, TestData.SINGLE_TARIFF_METER));
 
         Long nonExistentIdTariff = 999999999L;
-
-        List<AllMetersResponseModel> historyResponse = api.allMeters.getDeviceReadingsHistory(token, SINGLE_TARIFF_METER);
-
-        AllMetersResponseModel firstRecord = step("Извлечение данных первого прибора из истории",
-                () -> {
-                    AllMetersResponseModel record = historyResponse.get(0);
-                    return record;
-                });
-        AllMetersResponseModel.Meter firstMeter = step("Извлечение данных первого тарифа",
-                () -> {
-                    AllMetersResponseModel.Meter meter = firstRecord.meters().get(0);
-                    return meter;
-                });
 
         String requestBody = """
                 {
@@ -556,7 +370,7 @@ public class MeterSubmissionTest extends TestBase {
                         }
                     ]
                 }
-                """.formatted(firstRecord.idDevice(), VALID_RECEIVING_METHOD, nonExistentIdTariff);
+                """.formatted(meterData.idDevice(), TestData.VALID_RECEIVING_METHOD, nonExistentIdTariff);
 
         String errorResponse = step(
                 "Отправка POST-запроса с несуществующим id_tariff=" + nonExistentIdTariff,
@@ -567,7 +381,7 @@ public class MeterSubmissionTest extends TestBase {
             assertThat(errorResponse)
                     .as("Ответ должен содержать сообщение об ошибке")
                     .isNotBlank()
-                    .contains(INVALID_READINGS_ERROR_MESSAGE);
+                    .contains(TestData.INVALID_READINGS_ERROR_MESSAGE);
         });
     }
 }

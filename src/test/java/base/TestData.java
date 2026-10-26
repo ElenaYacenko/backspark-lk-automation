@@ -16,14 +16,19 @@ public class TestData {
     public static final int FKR_METER = 441743243;
     public static final int EMPTY_METER = 441743243;
 
-    // === Не существет аккаунт ===
+    // === Не существует аккаунт ===
     public static final int OTHER_USER_ACCOUNT = 666666666;
 
+    // === Сообщения API ===
+    public static final String SUCCESS_SUBMISSION_MESSAGE = "Показания переданы успешно";
+    public static final String INVALID_READINGS_ERROR_MESSAGE = "Ошибка сохранения показания. Проверьте корректность переданных данных.";
 
+    // === Параметры отправки ===
+    public static final Long READING_INCREMENT = 10L;
+    public static final Integer VALID_RECEIVING_METHOD = 41;
 
-
-
-
-
-
+    // === AllMeters: даты и сообщения ===
+    public static final String DATE_START = "2026-04-01";
+    public static final String DATE_END = "2026-11-01";
+    public static final String ERROR_MISSING = "Отсутствует обязательный параметр";
 }

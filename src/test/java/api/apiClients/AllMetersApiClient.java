@@ -16,9 +16,8 @@ import static api.specs.allMeters.AllMetersSpec.*;
 
 public class AllMetersApiClient {
 
-    // === Даты в запросе, поставила полгода ===
-    public static final String DATE_START = "2026-04-01";
-    public static final String DATE_END = "2026-11-01";
+    private static final String DATE_START = "2026-04-01";
+    private static final String DATE_END = "2026-11-01";
 
     @Step("[API] Получение истории показаний ПУ за период с startDate по endDate")
     public List<AllMetersResponseModel> getDeviceReadingsHistory(String token, int idPa) {

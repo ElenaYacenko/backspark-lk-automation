@@ -181,10 +181,28 @@ browserstack.key=<ваш_ключ>
 
 ## 🔄 CI/CD и интеграции
 
-### 🔧 Jenkins: прогон API-тестов
-### 📊 Allure TestOps
-### 📋 Jira
+### 🔧 [Jenkins: прогон API-тестов](https://jenkins.qa.guru/job/42-yacenko-diplom/)
+
+![jenkins.png](images/jenkins.png)
+
+Jenkins используется как CI-сервер для автоматического запуска API, UI и Mobile тестов. Сборка настроена как FreeStyle Project с двумя шагами Gradle: API+UI через Selenoid (headless Chrome) и Mobile через Android-эмулятор в Selenoid. Результаты собираются в Allure-отчет, уведомления уходят в Telegram.
+
+### 📊 [Allure TestOps](https://allure.qa.guru/launch/56737)
+
+![TestOps.png](images/TestOps.png)
+![TestOps_test.png](images/TestOps_test.png)
+
+Интеграция с Allure TestOps позволяет централизованно хранить результаты прогонов, отслеживать историю запусков и строить тренды стабильности тестов.
+
+### 📋 [Jira](https://jira.qa.guru/projects/MUL/issues/MUL-57?filter=allopenissues)
+
+![jira.png](images/jira.png)
+Все тест-кейсы заведены в проект Multistack (MUL) и привязаны к задаче MUL-57. Каждый автотест имеет соответствующий тест-кейс в Jira, что обеспечивает трассируемость от требования до автотеста.
+
 ### 💬 Telegram
+
+![telegram.png](images/telegram.png)
+Автоматические уведомления в Telegram-канал после каждого завершения сборки: круговая диаграмма результатов, количество сценариев, продолжительность прогона и прямая ссылка на Allure-отчет.
 
 ## 🏗 Архитектура и подходы
 

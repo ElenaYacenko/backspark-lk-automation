@@ -21,7 +21,7 @@ public class TestConfig {
         String getBaseUrl();
 
         @Key("apiUrl")
-        @DefaultValue("https://lknew.ch-sk.ru")
+        @DefaultValue("https://lknew-bek.ch-sk.ru")
         String getApiUrl();
 
         @Key("apiDBUrl")

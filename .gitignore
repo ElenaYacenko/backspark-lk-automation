@@ -31,3 +31,6 @@ out/
 Thumbs.db
 "@ | Out-File -FilePath .gitignore -Encoding utf8
 bin/
+
+notifications/config.json
+notifications/draft.txt

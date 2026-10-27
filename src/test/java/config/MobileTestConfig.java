@@ -87,4 +87,12 @@ public interface MobileTestConfig extends Config{
     @Key("local.app.baseUrl")
     @DefaultValue("")
     String localAppBaseUrl();
+
+    @Key("selenoid.hubUrl")
+    @DefaultValue("https://user1:1234@selenoid.autotests.cloud/wd/hub") // Подставь реальный URL школы, если он другой
+    String selenoidHubUrl();
+
+    @Key("selenoid.android.version")
+    @DefaultValue("11.0") // Или "15.0", в зависимости от того, какие образы есть в Selenoid школы
+    String selenoidAndroidVersion();
 }

@@ -60,16 +60,16 @@
 ## 🛠 Технологический стек
 </div>
 
-| Компонент | Технология | Версия |
-| :--- | :--- | :--- |
-| **Язык** | Java | 21 |
-| **Сборщик** | Gradle | 8.14.3 |
-| **API-тесты** | RestAssured + Jackson | 5.5.0 |
-| **UI-тесты** | Selenide + Selenium | 7.13.0 / 4.27.0 |
-| **Mobile-тесты** | Appium Java Client + UiAutomator2 | 10.0.0 |
-| **Отчетность** | Allure Framework | 2.29.0 |
-| **Конфигурация** | Aeonbits Owner | 1.0.12 |
-| **Тест-раннер** | JUnit 5 | 5.11.0 |
+| Компонент | Технология | Версия                          |
+| :--- | :--- |:--------------------------------|
+| **Язык** | Java | 17                              |
+| **Сборщик** | Gradle | 8.14.3                          |
+| **API-тесты** | RestAssured + Jackson | 5.5.0                           |
+| **UI-тесты** | Selenide + Selenium | 7.13.0 / 4.39.0                 |
+| **Mobile-тесты** | Appium Java Client + UiAutomator2 | 10.0.0                          |
+| **Отчетность** | Allure Framework | 2.29.0                          |
+| **Конфигурация** | Aeonbits Owner | 1.0.12                          |
+| **Тест-раннер** | JUnit 5 | 5.11.0                          |
 | **Утилиты** | Lombok, DataFaker, AssertJ, Commons-IO | 9.2.0 / 2.5.4 / 3.27.7 / 2.16.1 |
 
 ---
@@ -179,7 +179,7 @@ browserstack.key=<ваш_ключ>
 ---
 <div align="center">
 
-## 🔄 🔄 CI/CD и интеграции
+## 🔄 CI/CD и интеграции
 
 ### 🔧 Jenkins: прогон API-тестов
 ### 📊 Allure TestOps

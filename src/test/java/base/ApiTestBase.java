@@ -9,8 +9,7 @@ import utils.AccountDataHelper;
 
 /**
  * Базовый класс для API-тестов.
- * Содержит: ApiClient, настройку RestAssured, AccountDataHelper.
- */
+ **/
 public class ApiTestBase {
 
     protected static final ApiClient api = new ApiClient();

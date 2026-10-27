@@ -7,10 +7,13 @@ import config.TestConfig;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import ui.components.AccountsSidebarComponent;
 import ui.components.HeaderComponent;
 import ui.components.UnifiedAccountsSidebarComponent;
 import ui.pages.*;
+
+import java.util.Map;
 
 import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.Selenide.webdriver;
@@ -21,7 +24,7 @@ import static com.codeborne.selenide.Selenide.webdriver;
 public class UiTestBase extends ApiTestBase {
 
     static {
-        Configuration.baseUrl = TestConfig.getBaseUrl();
+        Configuration.baseUrl = System.getProperty("url", TestConfig.getBaseUrl());
     }
 
     // Page Objects
@@ -43,8 +46,27 @@ public class UiTestBase extends ApiTestBase {
     @BeforeEach
     void setUpUi() {
         Configuration.browser = System.getProperty("browser", "chrome");
-        Configuration.browserSize = "1920x1080";
-        Configuration.timeout = 20000;
+        Configuration.browserSize = System.getProperty("browserSize", "1920x1080");
+        Configuration.browserVersion = System.getProperty("browserVersion", "155.0");
+        Configuration.timeout = 10000;
+
+        String remote = System.getProperty("remote");
+        if (remote != null && !remote.isEmpty()) {
+            Configuration.remote = remote;
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+            capabilities.setCapability("selenoid:options", Map.<String, Object>of(
+                    "enableVNC", true,
+                    "enableVideo", true,
+                    "enableLog", true
+            ));
+            Configuration.browserCapabilities = capabilities;
+        }
+
+        // Логирование для проверки
+        System.out.println("URL: " + Configuration.baseUrl);
+        System.out.println("Browser: " + Configuration.browser);
+        System.out.println("Browser size: " + Configuration.browserSize);
+        System.out.println("Remote: " + Configuration.remote);
 
         SelenideLogger.addListener(LISTENER_NAME, new AllureSelenide()
                 .savePageSource(true)

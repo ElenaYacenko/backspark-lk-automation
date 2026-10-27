@@ -38,6 +38,10 @@ public class AndroidDriverProvider implements WebDriverProvider {
                 caps = browserstackCaps(config);
                 hub = config.browserstackHubUrl();
             }
+            case "selenoid" -> {
+                caps = selenoidCaps(config);
+                hub = System.getProperty("remote", config.selenoidHubUrl());
+            }
             default -> throw new IllegalArgumentException(
                     "Android deviceHost: emulation, real, browserstack. Got: " + host);
         }
@@ -93,6 +97,27 @@ public class AndroidDriverProvider implements WebDriverProvider {
         bstack.put("debug", true);
 
         caps.setCapability("bstack:options", bstack);
+        return caps;
+    }
+
+    // для Selenoid
+    private static MutableCapabilities selenoidCaps(MobileTestConfig config) {
+        MutableCapabilities caps = androidCaps(config);
+
+        caps.setCapability("browserName", "android");
+
+        caps.setCapability("version", config.selenoidAndroidVersion() != null ? config.selenoidAndroidVersion() : "11.0");
+
+        if (config.deviceName() != null && !config.deviceName().isBlank()) {
+            caps.setCapability("deviceName", config.deviceName());
+        }
+
+        Map<String, Object> selenoidOptions = new HashMap<>();
+        selenoidOptions.put("enableVNC", true);
+        selenoidOptions.put("enableVideo", true);
+        selenoidOptions.put("enableLog", true);
+        caps.setCapability("selenoid:options", selenoidOptions);
+
         return caps;
     }
 

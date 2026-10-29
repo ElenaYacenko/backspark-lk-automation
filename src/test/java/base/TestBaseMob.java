@@ -6,6 +6,8 @@ import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import config.TestConfig;
+import io.appium.java_client.screenrecording.CanRecordScreen;
+import io.qameta.allure.Allure;
 import io.qameta.allure.selenide.AllureSelenide;
 import io.restassured.RestAssured;
 import mobile.drivers.AndroidDriverProvider;
@@ -17,8 +19,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import utils.AccountDataHelper;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.util.Base64;
+
 import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.Selenide.open;
+import com.codeborne.selenide.WebDriverRunner;
 
 public class TestBaseMob {
 
@@ -42,7 +50,7 @@ public class TestBaseMob {
         Configuration.pageLoadTimeout = -1;
         Configuration.browser = AndroidDriverProvider.class.getName();
         Configuration.browserSize = null;
-        Configuration.timeout = 10_000;          // было 30_000 — слишком долго
+        Configuration.timeout = 10_000;
         Configuration.screenshots = true;
         Configuration.savePageSource = false;
 
@@ -57,10 +65,32 @@ public class TestBaseMob {
                 .screenshots(true)
                 .savePageSource(false));
         open();
+
+        try {
+            ((CanRecordScreen) WebDriverRunner.getWebDriver()).startRecordingScreen();
+        } catch (Exception e) {
+            System.out.println("Не удалось начать запись видео: " + e.getMessage());
+        }
     }
 
     @AfterEach
     void closeApp() {
+        try {
+            // Получаем видео в формате Base64
+            String videoBase64 = ((CanRecordScreen) WebDriverRunner.getWebDriver()).stopRecordingScreen();
+
+            // Создаем временный файл
+            File videoFile = new File("build/mobile-test-video.mp4");
+            videoFile.getParentFile().mkdirs();
+            Files.write(videoFile.toPath(), Base64.getDecoder().decode(videoBase64));
+
+            // Прикрепляем видео в отчет Allure
+            Allure.addAttachment("📹 Видео прогона теста", "video/mp4", new FileInputStream(videoFile), "mp4");
+
+        } catch (Exception e) {
+            System.out.println("Не удалось сохранить или прикрепить видео: " + e.getMessage());
+        }
+
         boolean isBrowserstack = "browserstack".equals(System.getProperty("deviceHost"));
         String sessionId = isBrowserstack ? Selenide.sessionId().toString() : null;
 

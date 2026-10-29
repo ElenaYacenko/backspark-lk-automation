@@ -146,6 +146,15 @@ udid=emulator-5554
 # С отчетом Allure
 ./gradlew test --tests "mobile.tests.*" -DdeviceHost=emulation && ./gradlew allureServe
 ```
+
+### 📹 Демонстрация работы
+
+Автоматическая авторизация в мобильном приложении:
+
+![Демонстрация авторизации](images/data_attachments_28a8763e900698f6.gif)
+
+> **Примечание:** Видео демонстрирует успешный вход с использованием тестовых учетных данных.*
+
 ---
 <div align="center">
 

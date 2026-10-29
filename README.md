@@ -175,6 +175,13 @@ browserstack.key=<ваш_ключ>
 ```bash
 ./gradlew test --tests "api.tests.*" && ./gradlew allureServe
 ```
+<div align="center">
+
+## 🎬 Демонстрация работы
+
+![Web demo](images/ui.gif)
+
+</div>
 
 ---
 <div align="center">

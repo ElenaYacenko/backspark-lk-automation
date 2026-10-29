@@ -144,8 +144,8 @@ cd backspark-lk-automation
 
 ```properties
 # Тестовый пользователь (для API и UI тестов)
-test.user.phone=<номер_телефона>
-test.user.password=<пароль>
+testUser.phone=<номер_телефона>
+testUser.password=<пароль>
 
 # BrowserStack (для мобильных тестов)
 browserstack.user=<ваш_логин>

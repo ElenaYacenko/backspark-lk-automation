@@ -8,6 +8,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.HashMap;
@@ -53,14 +54,23 @@ public class AndroidDriverProvider implements WebDriverProvider {
     private static MutableCapabilities localCaps(MobileTestConfig config, boolean realDevice) {
         MutableCapabilities caps = androidCaps(config);
 
-        // APK: устанавливаем только если путь явно указан в конфиге
-        String apkPath = localApkPath(config);
-        if (apkPath != null && !apkPath.isBlank()) {
-            caps.setCapability("appium:app", apkPath);
+        // Автоматичесткая установка APK
+        String apkPath = config.localAppPath();
+        File apkFile = new File(apkPath);
+
+        if (apkFile.exists()) {
+            // Передаем абсолютный путь. Appium сам установит приложение на девайс!
+            caps.setCapability("appium:app", apkFile.getAbsolutePath());
+            System.out.println("📱 Appium автоматически установит APK из: " + apkFile.getAbsolutePath());
+        } else {
+            throw new IllegalStateException(
+                    "❌ APK файл не найден по пути: " + apkFile.getAbsolutePath() +
+                            "\nПожалуйста, убедитесь, что файл chsk.apk лежит в папке src/test/resources/apk/"
+            );
         }
+
         caps.setCapability("appium:ignoreHiddenApiPolicyError", true);
 
-        // UDID — обязателен для реального устройства
         String udid = config.udid();
         if (realDevice && (udid == null || udid.isBlank())) {
             throw new IllegalStateException("Set -Dudid= to the USB device (adb devices)");
@@ -69,7 +79,6 @@ public class AndroidDriverProvider implements WebDriverProvider {
             caps.setCapability("appium:udid", udid);
         }
 
-        // Версия Android и имя устройства
         if (config.platformVersion() != null && !config.platformVersion().isBlank()) {
             caps.setCapability("appium:platformVersion", config.platformVersion());
         }

@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Epic("Показания")
@@ -43,7 +42,7 @@ public class AllMetersEndpointTest extends ApiTestBase {
     void shouldReturnFilteredHistoryByDates() {
         var response = api.allMeters.getDeviceReadingsHistory(token, TestData.SINGLE_TARIFF_METER);
 
-        step("Проверка, что история не пустая", () -> assertThat(response).isNotEmpty());
+        assertThat(response).as("История показаний не должна быть пустой").isNotEmpty();
         AllMetersHelper.assertAllReadingDatesInRange(
                 response,
                 LocalDate.parse(TestData.DATE_START),
@@ -60,10 +59,8 @@ public class AllMetersEndpointTest extends ApiTestBase {
     void shouldReturnHistoryForMultiTariffMeter(int meterId, String[] expectedTariffs) {
         var response = api.allMeters.getDeviceReadingsHistory(token, meterId);
 
-        step("Проверка наличия всех тарифов", () -> {
-            assertThat(response).as("История показаний не должна быть пустой").isNotEmpty();
-            AllMetersHelper.assertTariffsPresent(response, expectedTariffs);
-        });
+        assertThat(response).as("История показаний не должна быть пустой").isNotEmpty();
+        AllMetersHelper.assertTariffsPresent(response, expectedTariffs);
     }
 
     @Test
@@ -73,8 +70,7 @@ public class AllMetersEndpointTest extends ApiTestBase {
     @Severity(SeverityLevel.CRITICAL)
     void shouldReturnHistoryForWaterMeter() {
         var response = api.allMeters.getDeviceReadingsHistory(token, TestData.WATER_METER);
-        step("Проверка структуры ответа для водяного ПУ", () ->
-                assertThat(response).as("История показаний не должна быть пустой").isNotEmpty());
+        assertThat(response).as("История показаний не должна быть пустой").isNotEmpty();
     }
 
     @Test
@@ -84,8 +80,7 @@ public class AllMetersEndpointTest extends ApiTestBase {
     @Severity(SeverityLevel.NORMAL)
     void shouldReturnEmptyArrayForAccountWithoutFkrMeters() {
         var response = api.allMeters.getDeviceReadingsHistory(token, TestData.FKR_METER);
-        step("Проверка, что ответ — пустой массив", () ->
-                assertThat(response).as("Для ЛС без ПУ ФКР должен возвращаться пустой массив").isEmpty());
+        assertThat(response).as("Для ЛС без ПУ ФКР должен возвращаться пустой массив").isEmpty();
     }
 
     @Test
@@ -95,8 +90,7 @@ public class AllMetersEndpointTest extends ApiTestBase {
     @Severity(SeverityLevel.NORMAL)
     void shouldReturnEmptyArrayWhenEndDateBeforeStartDate() {
         var response = api.allMeters.getAllMetersHistoryWithStartDateBeforeEndDate(token, TestData.SINGLE_TARIFF_METER);
-        step("Проверка, что ответ — пустой массив", () ->
-                assertThat(response).as("При endDate < startDate API должен вернуть пустой массив").isEmpty());
+        assertThat(response).as("При endDate < startDate API должен вернуть пустой массив").isEmpty();
     }
 
     @Test
@@ -146,7 +140,7 @@ public class AllMetersEndpointTest extends ApiTestBase {
     @Severity(SeverityLevel.NORMAL)
     void shouldReturn404WhenIdPaMissing() {
         Response response = api.allMeters.getDeviceReadingsHistoryWithoutIdPa(token);
-        step("Проверка статуса ответа", () -> assertThat(response.statusCode()).isEqualTo(404));
+        assertThat(response.statusCode()).isEqualTo(404);
     }
 
     static Stream<Arguments> tariffData() {

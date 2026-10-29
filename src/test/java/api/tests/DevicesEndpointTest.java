@@ -15,7 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static base.TestData.*;
-import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Epic("Приборы учёта")
@@ -47,13 +46,9 @@ public class DevicesEndpointTest extends ApiTestBase {
     void shouldReturnCorrectTariffsForMeter(int meterId, String[] expectedTariffs) {
         DevicesResponseModel response = api.devices.userDevicesInfo(token, meterId);
 
-        step("Проверка базовой структуры ответа", () -> {
-            DevicesResponseHelper.assertHasAtLeastOneDevice(response);
-            DevicesResponseHelper.assertFirstDeviceHasExactlyNMeters(response, expectedTariffs.length);
-        });
-        step("Проверка названий тарифов", () ->
-                DevicesResponseHelper.assertFirstDeviceHasMetersWithTitleInOrder(response, expectedTariffs)
-        );
+        DevicesResponseHelper.assertHasAtLeastOneDevice(response);
+        DevicesResponseHelper.assertFirstDeviceHasExactlyNMeters(response, expectedTariffs.length);
+        DevicesResponseHelper.assertFirstDeviceHasMetersWithTitleInOrder(response, expectedTariffs);
     }
 
     @Test
@@ -69,11 +64,8 @@ public class DevicesEndpointTest extends ApiTestBase {
     void shouldReturnWaterMeterDevicesForValidAccount() {
         DevicesResponseModel response = api.devices.userDevicesInfo(token, WATER_METER);
 
-        step("Проверка наличия приборов учёта", () ->
-                DevicesResponseHelper.assertHasAtLeastOneDevice(response));
-
-        step("Проверка целостности данных по всем тарифам", () ->
-                DevicesResponseHelper.assertAllDevicesHaveMeters(response));
+        DevicesResponseHelper.assertHasAtLeastOneDevice(response);
+        DevicesResponseHelper.assertAllDevicesHaveMeters(response);
     }
 
     @Test
@@ -88,9 +80,7 @@ public class DevicesEndpointTest extends ApiTestBase {
     @Severity(SeverityLevel.CRITICAL)
     void shouldReturn401WhenAccountNotLinkedToLkk() {
         DevicesResponseModel response = api.devices.userEmptyDevicesInfo(token, EMPTY_METER);
-
-        step("Проверка содержимого ответа", () ->
-                DevicesResponseHelper.assertEmptyDevicesStructure(response));
+        DevicesResponseHelper.assertEmptyDevicesStructure(response);
     }
 
     @Test
@@ -107,15 +97,13 @@ public class DevicesEndpointTest extends ApiTestBase {
     void shouldReturn401WhenAccountNotLinkedToLKK() {
         Response response = api.devices.accountNotInLKK(token, OTHER_USER_ACCOUNT);
 
-        step("Проверка статуса и структуры ответа", () -> {
-            assertThat(response.statusCode())
-                    .as("HTTP статус должен быть 401")
-                    .isEqualTo(401);
+        assertThat(response.statusCode())
+                .as("HTTP статус должен быть 401")
+                .isEqualTo(401);
 
-            assertThat(response.jsonPath().getString("message"))
-                    .as("Тело ответа должно содержать сообщение об ошибке")
-                    .isNotBlank();
-        });
+        assertThat(response.jsonPath().getString("message"))
+                .as("Тело ответа должно содержать сообщение об ошибке")
+                .isNotBlank();
     }
 
     @Test
@@ -130,12 +118,7 @@ public class DevicesEndpointTest extends ApiTestBase {
     @Severity(SeverityLevel.NORMAL)
     void shouldReturn404WhenIdPaIsMissing() {
         Response response = api.devices.errorMissingParameter(token);
-
-        step("Проверка статуса и структуры ответа", () -> {
-            assertThat(response.statusCode())
-                    .as("HTTP статус должен быть 404")
-                    .isEqualTo(404);
-        });
+        assertThat(response.statusCode()).isEqualTo(404);
     }
 
     static Stream<Arguments> singleMeterTariffScenarios() {

@@ -80,8 +80,12 @@ public interface MobileTestConfig extends Config{
     String androidApp();
 
     // ===== Local APK =====
+    @Key("local.app.path")
+    @DefaultValue("src/test/resources/apk/chsk.apk")
+    String localAppPath();
+
     @Key("local.app.name")
-    @DefaultValue("app-alpha-universal-release.apk")
+    @DefaultValue("chsk.apk")
     String localAppName();
 
     @Key("local.app.baseUrl")

@@ -4,7 +4,11 @@
 
 [⬅️ Вернуться в главный README проекта](../../../../../README.md)
 
-![mobile.png](../../../../images/mobile.png)
+[![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://openjdk.org/)
+[![Selenide](https://img.shields.io/badge/Selenide-7.13.0-green.svg)](https://selenide.org/)
+[![Appium](https://img.shields.io/badge/Appium-10.0.0-orange.svg)](https://appium.io/)
+[![Allure](https://img.shields.io/badge/Allure-2.29.0-purple.svg)](https://allurereport.org/)
+[![Gradle](https://img.shields.io/badge/Gradle-8.14.3-brightgreen.svg)](https://gradle.org/)
 
 </div>
 
@@ -15,13 +19,12 @@
 
 <div align="center">
 
-[![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://openjdk.org/)
-[![Selenide](https://img.shields.io/badge/Selenide-7.13.0-green.svg)](https://selenide.org/)
-[![Appium](https://img.shields.io/badge/Appium-10.0.0-orange.svg)](https://appium.io/)
-[![Allure](https://img.shields.io/badge/Allure-2.29.0-purple.svg)](https://allurereport.org/)
-[![Gradle](https://img.shields.io/badge/Gradle-8.14.3-brightgreen.svg)](https://gradle.org/)
+## 📹 Демонстрация работы
 
-</div>
+### Автоматическая авторизация в мобильном приложении
+
+![Демонстрация авторизации](../../../../images/mobile-login-demo.gif)
+ </div>
 
 ---
 
@@ -103,7 +106,6 @@ src/test/resources/
 ## 🚀 Быстрый старт
 </div>
 
----
 ### 1. Подготовка
 ```bash
 # Запусти эмулятор в Android Studio

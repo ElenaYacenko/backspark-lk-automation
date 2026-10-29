@@ -3,10 +3,7 @@ package ui.tests;
 import config.TestConfig;
 import io.qameta.allure.*;
 import api.models.userProfile.UserProfileResponseModel;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import base.UiTestBase;
 import extensions.WithLogin;
 import utils.AuthContext;
@@ -158,6 +155,7 @@ public class WebSmokeTest extends UiTestBase {
     }
 
     @Test
+    @Disabled("Временно отключен чтобы не засорять БД")
     @DisplayName("TC-SMOKE-005: Успешная передача показаний счётчика")
     @Description("""
             Цель: Проверить полный цикл передачи показаний

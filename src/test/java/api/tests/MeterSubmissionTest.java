@@ -37,6 +37,7 @@ public class MeterSubmissionTest extends ApiTestBase {
     }
 
     @Test
+    @Disabled("Временно отключен чтобы не засорять БД")
     @DisplayName("Успешная передача показаний счетчика")
     @Description("""
             Цель: Проверка успешной передачи показаний прибора учета.
@@ -61,6 +62,7 @@ public class MeterSubmissionTest extends ApiTestBase {
     }
 
     @Test
+    @Disabled("Временно отключен чтобы не засорять БД")
     @DisplayName("Успешная передача показаний двухтарифного счетчика (День/Ночь)")
     @Description("""
             Цель: Проверка успешной передачи показаний двухтарифного прибора учета.
@@ -93,6 +95,7 @@ public class MeterSubmissionTest extends ApiTestBase {
     }
 
     @Test
+    @Disabled("Временно отключен чтобы не засорять БД")
     @DisplayName("Успешная передача показаний трёхтарифного счетчика (Пик/Полупик/Ночь)")
     @Description("""
             Цель: Проверка успешной передачи показаний трёхтарифного прибора учета.
@@ -129,6 +132,7 @@ public class MeterSubmissionTest extends ApiTestBase {
     }
 
     @Test
+    @Disabled("Временно отключен чтобы не засорять БД")
     @DisplayName("Успешная передача показаний счетчика воды")
     @Description("""
             Цель: Проверка успешной передачи показаний прибора учёта воды.

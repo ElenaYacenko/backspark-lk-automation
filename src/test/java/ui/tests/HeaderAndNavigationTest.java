@@ -5,8 +5,6 @@ import org.junit.jupiter.api.*;
 import base.UiTestBase;
 import extensions.WithLogin;
 
-import static io.qameta.allure.Allure.step;
-
 @Epic("Личный кабинет")
 @Feature("Шапка приложения (Header)")
 @Story("Навигация по основному меню и интерактивные элементы")
@@ -15,11 +13,9 @@ public class HeaderAndNavigationTest extends UiTestBase {
 
     @BeforeEach
     void setUpHeaderTests() {
-        step("UI: Открываем главную страницу и закрываем приветственную модалку (если есть)", () -> {
-            mainPage.openMainPage();
-            modalDialog.modalFKROpened();
-            modalDialog.clickCloseButton();
-        });
+        mainPage.openMainPage();
+        modalDialog.modalFKROpened();
+        modalDialog.clickCloseButton();
     }
 
     @Test
@@ -33,9 +29,7 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldDisplayAllHeaderElementsOnMainPage() {
-        step("UI: Проверяем отображение всех элементов хедера", () -> {
-            headerComponent.verifyAllHeaderElementsVisible();
-        });
+        headerComponent.verifyAllHeaderElementsVisible();
     }
 
     @Test
@@ -49,12 +43,8 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldNavigateToCheskSiteWhenClickingLogo() {
-        step("UI: Кликаем на Логотип", () -> {
-            headerComponent.clickHeaderLogo();
-        });
-        step("UI: Проверить открытие сайта 'ЧЭСК'", () -> {
-            headerComponent.verifyHeaderLogoLink();
-        });
+        headerComponent.clickHeaderLogo();
+        headerComponent.verifyHeaderLogoLink();
     }
 
     @Test
@@ -68,16 +58,10 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldNavigateToHomeWhenClickingHomeButton() {
-        step("UI: Открываем страницу передачи показаний", () -> {
-            readingsPage.openReadingsPage();
-        });
-        step("UI: Кликаем на Главная", () -> {
-            headerComponent.clickHeaderNavHome();
-        });
-        step("UI: Проверяем переход на главную страницу и отображение элементов хедера", () -> {
-            mainPage.verifyHomeUrl();
-            headerComponent.verifyAllHeaderElementsVisible();
-        });
+        readingsPage.openReadingsPage();
+        headerComponent.clickHeaderNavHome();
+        mainPage.verifyHomeUrl();
+        headerComponent.verifyAllHeaderElementsVisible();
     }
 
     @Test
@@ -91,14 +75,10 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldNavigateToCheskSiteWhenClickingFinance() {
-        step("UI: Кликаем на Финансы", () -> {
-            headerComponent.clickHeaderNavFinance();
-        });
-        step("UI: Проверяем переход на страницу финансы", () -> {
-            paymentPage
-                    .verifyFinanceUrl()
-                    .verifyNavigationToFinance();
-        });
+        headerComponent.clickHeaderNavFinance();
+        paymentPage
+                .verifyFinanceUrl()
+                .verifyNavigationToFinance();
     }
 
     @Test
@@ -112,15 +92,9 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldNavigateToCheskSiteWhenClickingReadings() {
-        step("UI: Кликаем на 'Показания' в хедере", () -> {
-            headerComponent.clickHeaderNavReadings();
-        });
-        step("UI: проверяем URL страницы 'Показания'", () -> {
-            readingsPage.verifyPageUrl();
-        });
-        step("UI: Проверяем наличие кнопок 'Передать показания' и 'История показаний'", () -> {
-            readingsPage.verifyReadingSubmitAndHistoryButtons();
-        });
+        headerComponent.clickHeaderNavReadings();
+        readingsPage.verifyPageUrl();
+        readingsPage.verifyReadingSubmitAndHistoryButtons();
     }
 
     @Test
@@ -134,14 +108,10 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldNavigateToCheskSiteWhenClickingServices() {
-        step("UI: Кликаем на Сервисы", () -> {
-            headerComponent.clickHeaderNavServices();
-        });
-        step("UI: Проверяем переход на страницу сервисов", () -> {
-            headerComponent
-                    .verifyServicesUrl()
-                    .verifyNavigationToServices();
-        });
+        headerComponent.clickHeaderNavServices();
+        headerComponent
+                .verifyServicesUrl()
+                .verifyNavigationToServices();
     }
 
     @Test
@@ -155,12 +125,8 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldNavigateToCheskSiteWhenClickingNotifications() {
-        step("UI: Кликаем на иконку 'Колокольчик'", () -> {
-            headerComponent.clickHeaderNotificationsIcon();
-        });
-        step("UI: Проверяем открытое окно с уведомлениями", () -> {
-            headerComponent.verifyNotificationsDropdownVisible();
-        });
+        headerComponent.clickHeaderNotificationsIcon();
+        headerComponent.verifyNotificationsDropdownVisible();
     }
 
     @Test
@@ -174,12 +140,8 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldOpenTourModalWhenClickingLampIcon() {
-        step("UI: Кликаем на иконку 'Лампочка'", () -> {
-            headerComponent.clickHeaderLampIcon();
-        });
-        step("UI: Проверяем открытое приветственное окно обучающего тура", () -> {
-            headerComponent.verifyTourModalVisible();
-        });
+        headerComponent.clickHeaderLampIcon();
+        headerComponent.verifyTourModalVisible();
     }
 
     @Test
@@ -193,11 +155,7 @@ public class HeaderAndNavigationTest extends UiTestBase {
     @Severity(SeverityLevel.NORMAL)
     @WithLogin
     void shouldNavigateToCheskSiteWhenClickingUserAvatar() {
-        step("UI: Кликаем на иконку 'Аватарка'", () -> {
-            headerComponent.clickHeaderUserAvatar();
-        });
-        step("UI: Проверяем открытое меню пользователя с кнопками 'Настройки меню' и 'Выход'", () -> {
-            headerComponent.verifyUserMenuDropdownVisible();
-        });
+        headerComponent.clickHeaderUserAvatar();
+        headerComponent.verifyUserMenuDropdownVisible();
     }
 }

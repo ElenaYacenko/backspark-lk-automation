@@ -8,8 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import utils.AccountDataHelper;
 
-import static io.qameta.allure.Allure.step;
-
 @Epic("Показания")
 @Feature("Показания в ЛКК")
 @Story("Страница передачи показаний")
@@ -21,12 +19,10 @@ public class ReadingsPageTest extends UiTestBase {
 
     @BeforeEach
     void setUpReadingsPage() {
-        step("UI: Открываем страницу 'Показания'", () -> {
-            readingsPage
-                    .openReadingsPage()
-                    .clickHistoryReadingsTabs()
-                    .clickSubmitReadingsTabs();
-        });
+        readingsPage
+                .openReadingsPage()
+                .clickHistoryReadingsTabs()
+                .clickSubmitReadingsTabs();
     }
 
     @Test
@@ -40,13 +36,8 @@ public class ReadingsPageTest extends UiTestBase {
     @Severity(SeverityLevel.CRITICAL)
     @WithLogin
     void testDisplayReadingsPage() {
-
-        step("UI: проверяем наличие кнопок Передать показания и История показаний", () -> {
-            readingsPage.verifyReadingSubmitAndHistoryButtons();
-        });
-        step("UI: проверяем наличие секций с ЛС и ЕЛС", () -> {
-            readingsPage.verifyAccountsAndUnifiedAccountsSection();
-        });
+        readingsPage.verifyReadingSubmitAndHistoryButtons();
+        readingsPage.verifyAccountsAndUnifiedAccountsSection();
     }
 
     @Test
@@ -62,17 +53,11 @@ public class ReadingsPageTest extends UiTestBase {
     void testDisplayAccountDetails() {
         AccountDataHelper.ActiveAccountData data = accountDataHelper.getFirstActiveAccountData();
 
-        step("UI: Выбираем лицевой счет и проверяем заголовок страницы", () -> {
-            readingsPage
-                    .selectAccountCard(data.accountNumber())
-                    .verifyAccountNumberIsDisplayed(data.accountNumber());
-        });
-        step("UI: Проверяем отображение данных прибора учета", () -> {
-            readingsPage.verifyMeterDeviceData(data.deviceTitle(), data.modification(), data.serialNumber());
-        });
-        step("UI: Проверяем дату следующей поверки", () -> {
-            readingsPage.verifyVerificationDate(data.formattedDateCheckNext());
-        });
+        readingsPage
+                .selectAccountCard(data.accountNumber())
+                .verifyAccountNumberIsDisplayed(data.accountNumber());
+        readingsPage.verifyMeterDeviceData(data.deviceTitle(), data.modification(), data.serialNumber());
+        readingsPage.verifyVerificationDate(data.formattedDateCheckNext());
     }
 
     @Test
@@ -88,19 +73,11 @@ public class ReadingsPageTest extends UiTestBase {
     void testDisplayLastReading() {
         AccountDataHelper.ActiveAccountData data = accountDataHelper.getFirstActiveAccountData();
 
-        step("UI: Выбираем лицевой счет и проверяем заголовок страницы", () -> {
-            readingsPage.selectAccountCard(data.accountNumber())
-                    .verifyAccountNumberIsDisplayed(data.accountNumber());
-        });
-        step("UI: Открываем карточку ПУ", () -> {
-            readingsPage.clickMeterDeviceToggle();
-        });
-        step("UI: Проверяем наличие названия тарифной зоны", () -> {
-            readingsPage.verifyTariffTitle(data.tariffTitle());
-        });
-        step("UI: Проверяем, что последнее показание совпадает с API", () -> {
-            readingsPage.verifyLastReading(data.lastReading());
-        });
+        readingsPage.selectAccountCard(data.accountNumber())
+                .verifyAccountNumberIsDisplayed(data.accountNumber());
+        readingsPage.clickMeterDeviceToggle();
+        readingsPage.verifyTariffTitle(data.tariffTitle());
+        readingsPage.verifyLastReading(data.lastReading());
     }
 
     @Test
@@ -116,35 +93,25 @@ public class ReadingsPageTest extends UiTestBase {
     @WithLogin
     void testSubmitReadingsSuccessfully() {
 
-        step("UI: Открываем карточку ПУ", () -> {
-            readingsPage.clickMeterDeviceToggle();
-        });
+        readingsPage.clickMeterDeviceToggle();
 
-        int tariffZoneCount = step("UI: Получаем количество тарифных зон", () -> readingsPage.getTariffZoneCount());
+        int tariffZoneCount = readingsPage.getTariffZoneCount();
 
         for (int i = 0; i < tariffZoneCount; i++) {
             final int idx = i;
-            step("UI: Вводим новое показание для тарифной зоны " + idx, () -> {
-                int previousReading = readingsPage.getLastReadingByZoneIndex(idx);
-                int newReading = previousReading + 5;
-                readingsPage.enterReadingByZoneIndex(idx, String.valueOf(newReading));
-            });
+            int previousReading = readingsPage.getLastReadingByZoneIndex(idx);
+            int newReading = previousReading + 5;
+            readingsPage.enterReadingByZoneIndex(idx, String.valueOf(newReading));
         }
 
         for (int i = 0; i < tariffZoneCount; i++) {
             final int idx = i;
-            step("UI: Проверяем разницу = 5 кВт·ч для зоны " + idx, () -> {
-                readingsPage.verifyDifferenceByZoneIndex(idx, 5);
-            });
+            readingsPage.verifyDifferenceByZoneIndex(idx, 5);
         }
 
-        step("UI: Нажимаем кнопку 'Отправить'", () -> {
-            readingsPage.clickSubmitReadingsButton();
-        });
-        step("UI: Проверяем модальное окно успешной передачи", () -> {
-            readingsPage.checkSuccessDialogIsVisible()
-                    .closeSuccessDialog();
-        });
+        readingsPage.clickSubmitReadingsButton();
+        readingsPage.checkSuccessDialogIsVisible()
+                .closeSuccessDialog();
     }
 
     @Test
@@ -159,12 +126,8 @@ public class ReadingsPageTest extends UiTestBase {
     @WithLogin
     void testDisplayTransmissionPeriod() {
 
-        step("UI: Открываем карточку ПУ", () -> {
-            readingsPage.clickMeterDeviceToggle();
-        });
-        step("UI: Проверяем отображение периода показаний", () -> {
-            readingsPage.verifyReadingPeriodInfo(READING_PERIOD_INFO);
-        });
+        readingsPage.clickMeterDeviceToggle();
+        readingsPage.verifyReadingPeriodInfo(READING_PERIOD_INFO);
     }
 
     @Test
@@ -179,17 +142,11 @@ public class ReadingsPageTest extends UiTestBase {
     @WithLogin
     void testReadingLessThanPrevious() {
 
-        step("UI: Открываем карточку ПУ", () -> {
-            readingsPage.clickMeterDeviceToggle();
-        });
-        step("UI: Вводим показание меньше предыдущего", () -> {
-            int previousReading = readingsPage.getLastReading();
-            int newReading = previousReading - 5;
-            readingsPage.enterReading(String.valueOf(newReading));
-        });
-        step("UI: Проверяем отображение ошибки о показаниях, меньших предыдущих", () -> {
-            readingsPage.verifyTariffZoneError(READINGS_ERROR_MESSAGE);
-        });
+        readingsPage.clickMeterDeviceToggle();
+        int previousReading = readingsPage.getLastReading();
+        int newReading = previousReading - 5;
+        readingsPage.enterReading(String.valueOf(newReading));
+        readingsPage.verifyTariffZoneError(READINGS_ERROR_MESSAGE);
     }
 
     @Test
@@ -205,34 +162,24 @@ public class ReadingsPageTest extends UiTestBase {
     @WithLogin
     void testReadingEqualToPrevious() {
 
-        step("UI: Открываем карточку ПУ", () -> {
-            readingsPage.clickMeterDeviceToggle();
-        });
+        readingsPage.clickMeterDeviceToggle();
 
-        int tariffZoneCount = step("UI: Получаем количество тарифных зон", () -> readingsPage.getTariffZoneCount());
+        int tariffZoneCount = readingsPage.getTariffZoneCount();
 
         for (int i = 0; i < tariffZoneCount; i++) {
             final int idx = i;
-            step("UI: Вводим показание, равное предыдущему, для зоны " + idx, () -> {
-                int previousReading = readingsPage.getLastReadingByZoneIndex(idx);
-                readingsPage.enterReadingByZoneIndex(idx, String.valueOf(previousReading));
-            });
+            int previousReading = readingsPage.getLastReadingByZoneIndex(idx);
+            readingsPage.enterReadingByZoneIndex(idx, String.valueOf(previousReading));
         }
 
         for (int i = 0; i < tariffZoneCount; i++) {
             final int idx = i;
-            step("UI: Проверяем разницу = 0 кВт·ч для зоны " + idx, () -> {
-                readingsPage.verifyDifferenceByZoneIndex(idx, 0);
-            });
+            readingsPage.verifyDifferenceByZoneIndex(idx, 0);
         }
 
-        step("UI: Нажимаем кнопку 'Отправить'", () -> {
-            readingsPage.clickSubmitReadingsButton();
-        });
-        step("UI: Проверяем модальное окно успешной передачи", () -> {
-            readingsPage.checkSuccessDialogIsVisible()
-                    .closeSuccessDialog();
-        });
+        readingsPage.clickSubmitReadingsButton();
+        readingsPage.checkSuccessDialogIsVisible()
+                .closeSuccessDialog();
     }
 
     @ParameterizedTest(name = "Ввод ''{0}'' → в поле остаётся ''{1}''")
@@ -260,15 +207,9 @@ public class ReadingsPageTest extends UiTestBase {
     })
     void testReadingInputSanitization(String input, String expected) {
 
-        step("UI: Открываем карточку ПУ", () -> {
-            readingsPage.clickMeterDeviceToggle();
-        });
-        step("UI: Вводим в поле показания значение '" + input + "'", () -> {
-            readingsPage.enterReading(input);
-        });
-        step("UI: Проверяем, что в поле осталось значение '" + expected + "'", () -> {
-            readingsPage.verifyReadingInputValue(expected);
-        });
+        readingsPage.clickMeterDeviceToggle();
+        readingsPage.enterReading(input);
+        readingsPage.verifyReadingInputValue(expected);
     }
 
     @Test
@@ -283,15 +224,9 @@ public class ReadingsPageTest extends UiTestBase {
     @WithLogin
     void testEmptyReadingSubmission() {
 
-        step("UI: Открываем карточку ПУ", () -> {
-            readingsPage.clickMeterDeviceToggle();
-        });
-        step("UI: Нажимаем кнопку 'Отправить показания'", () -> {
-            readingsPage.clickSubmitReadingsButton();
-        });
-        step("UI: Проверяем, что поле подсвечено красным бордюром", () -> {
-            readingsPage.verifyReadingInputHasErrorBorder();
-        });
+        readingsPage.clickMeterDeviceToggle();
+        readingsPage.clickSubmitReadingsButton();
+        readingsPage.verifyReadingInputHasErrorBorder();
     }
 
 
@@ -308,53 +243,31 @@ public class ReadingsPageTest extends UiTestBase {
     void testSwitchBetweenAccounts() {
         AccountDataHelper.TwoAccountsData accounts = accountDataHelper.getTwoActiveAccountData();
 
-        step("UI: Выбираем первый лицевой счет", () ->
-                readingsPage.selectAccountCard(accounts.first().accountNumber())
+        readingsPage.selectAccountCard(accounts.first().accountNumber());
+        readingsPage.verifyAccountNumberIsDisplayed(accounts.first().accountNumber());
+        readingsPage.waitForDeviceDataToLoad();
+        readingsPage.verifyMeterDeviceData(
+                accounts.first().deviceTitle(),
+                accounts.first().modification(),
+                accounts.first().serialNumber()
         );
-        step("UI: Проверяем номер первого ЛС", () ->
-                readingsPage.verifyAccountNumberIsDisplayed(accounts.first().accountNumber())
+
+        readingsPage.selectAccountCard(accounts.second().accountNumber());
+        readingsPage.verifyAccountNumberIsDisplayed(accounts.second().accountNumber());
+        readingsPage.waitForDeviceDataToLoad();
+        readingsPage.verifyMeterDeviceData(
+                accounts.second().deviceTitle(),
+                accounts.second().modification(),
+                accounts.second().serialNumber()
         );
-        step("UI: Ожидаем загрузки данных ПУ", () ->
-                readingsPage.waitForDeviceDataToLoad()
-        );
-        step("UI: Проверяем данные ПУ первого ЛС", () ->
-                readingsPage.verifyMeterDeviceData(
-                        accounts.first().deviceTitle(),
-                        accounts.first().modification(),
-                        accounts.first().serialNumber()
-                )
-        );
-        step("UI: Выбираем второй лицевой счет", () ->
-                readingsPage.selectAccountCard(accounts.second().accountNumber())
-        );
-        step("UI: Проверяем номер второго ЛС", () ->
-                readingsPage.verifyAccountNumberIsDisplayed(accounts.second().accountNumber())
-        );
-        step("UI: Ожидаем загрузки данных ПУ", () ->
-                readingsPage.waitForDeviceDataToLoad()
-        );
-        step("UI: Проверяем данные ПУ второго ЛС", () ->
-                readingsPage.verifyMeterDeviceData(
-                        accounts.second().deviceTitle(),
-                        accounts.second().modification(),
-                        accounts.second().serialNumber()
-                )
-        );
-        step("UI: Возвращаемся к первому лицевому счету", () ->
-                readingsPage.selectAccountCard(accounts.first().accountNumber())
-        );
-        step("UI: Проверяем номер первого ЛС после возврата", () ->
-                readingsPage.verifyAccountNumberIsDisplayed(accounts.first().accountNumber())
-        );
-        step("UI: Ожидаем загрузки данных ПУ", () ->
-                readingsPage.waitForDeviceDataToLoad()
-        );
-        step("UI: Проверяем данные ПУ первого ЛС после возврата", () ->
-                readingsPage.verifyMeterDeviceData(
-                        accounts.first().deviceTitle(),
-                        accounts.first().modification(),
-                        accounts.first().serialNumber()
-                )
+
+        readingsPage.selectAccountCard(accounts.first().accountNumber());
+        readingsPage.verifyAccountNumberIsDisplayed(accounts.first().accountNumber());
+        readingsPage.waitForDeviceDataToLoad();
+        readingsPage.verifyMeterDeviceData(
+                accounts.first().deviceTitle(),
+                accounts.first().modification(),
+                accounts.first().serialNumber()
         );
     }
 }

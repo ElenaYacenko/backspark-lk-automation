@@ -1,6 +1,6 @@
 package api.specs.devices;
 
-import config.TestConfig;
+import base.TestData;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.ResponseSpecification;
 
@@ -13,7 +13,7 @@ public class DevicesSpec {
     public static ResponseSpecification successfullDevicesResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(200)
-            //.expectBody(matchesJsonSchemaInClasspath(TestConfig.DEVICES_SUCCESS_SCHEMA))
+            //.expectBody(matchesJsonSchemaInClasspath(TestData.DEVICES_SUCCESS_SCHEMA))
             .expectBody("number", notNullValue())
             .expectBody("core_devices", notNullValue())
             .build();
@@ -21,7 +21,7 @@ public class DevicesSpec {
     public static ResponseSpecification successfullEmptyDevicesResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(200)
-            .expectBody(matchesJsonSchemaInClasspath(TestConfig.DEVICES_EMPTY_SUCCESS_SCHEMA))
+            .expectBody(matchesJsonSchemaInClasspath(TestData.DEVICES_EMPTY_SUCCESS_SCHEMA))
             .build();
 
     public static ResponseSpecification validation404FailedSpec = new ResponseSpecBuilder()

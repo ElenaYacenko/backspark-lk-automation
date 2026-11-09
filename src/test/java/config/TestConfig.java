@@ -96,10 +96,5 @@ public class TestConfig {
         return config.getUserStorageTemplate();
     }
 
-    // 4. Схемы ответов
-    public static final String DEVICES_SUCCESS_SCHEMA = "schemas/devices/devices/devices_response-schema.json";
-    public static final String DEVICES_EMPTY_SUCCESS_SCHEMA = "schemas/devices/devices/empty_devices_response_schema.json";
-    public static final String METERS_SUCCESS_SCHEMA = "schemas/devices/allMeters/all-meters-response-schema.json";
-    public static final String METERS_MISSING_SUCCESS_SCHEMA = "schemas/devices/allMeters/missing-parameters-schema.json";
-
+    // 4. Схемы ответов перенесены в base.TestData
 }

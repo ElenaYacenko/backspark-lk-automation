@@ -18,8 +18,6 @@ def restAssuredVersion = "5.5.0",
     allureVersion = "2.29.0",
     junitVersion = "5.11.0",
     appiumVersion = "10.0.0",
-    seleniumVersion = "4.39.0",
-    httpclientVersion = "4.5.14",
     slf4jVersion = "2.0.17"
 
 allure {
@@ -45,22 +43,12 @@ dependencies {
             "io.qameta.allure:allure-rest-assured:$allureVersion",
             "io.qameta.allure:allure-junit5:$allureVersion",
             "org.junit.jupiter:junit-jupiter:$junitVersion",
-            //"tools.jackson.core:jackson-databind:3.1.0",
-            //"com.fasterxml.jackson.core:jackson-databind:2.17.2",
             "net.datafaker:datafaker:2.5.4",
             "org.assertj:assertj-core:3.27.7",
             "org.aeonbits.owner:owner:1.0.12",
             "commons-io:commons-io:2.16.1",
-
-           // "org.junit.jupiter:junit-jupiter-api:5.11.0",
-           // "org.junit.jupiter:junit-jupiter-engine:5.11.0",
-            //"org.slf4j:slf4j-simple:$slf4jVersion",
             "org.freemarker:freemarker:2.3.32",
-           "ch.qos.logback:logback-classic:1.5.6",
-            "org.seleniumhq.selenium:selenium-api:$seleniumVersion",
-            "org.seleniumhq.selenium:selenium-remote-driver:$seleniumVersion",
-            "org.seleniumhq.selenium:selenium-support:$seleniumVersion",
-            "org.apache.httpcomponents:httpclient:$httpclientVersion"
+            "ch.qos.logback:logback-classic:1.5.6"
     )
     testImplementation("io.appium:java-client:$appiumVersion") {
         exclude group: 'org.seleniumhq.selenium'
@@ -70,9 +58,6 @@ dependencies {
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
 }
 
 sourceSets {
@@ -97,13 +82,14 @@ tasks.withType(Test) {
     useJUnitPlatform()
     systemProperties(System.getProperties())
     systemProperty 'file.encoding', 'UTF-8'
-    jvmArgs ("-Dfile.encoding=UTF-8",
+    jvmArgs = [
+            "-Dfile.encoding=UTF-8",
+            "-Dallure.listener=extensions.ManualTestListener",
             "--add-opens", "java.base/java.lang=ALL-UNNAMED",
             "--add-opens", "java.base/java.security=ALL-UNNAMED",
             "--add-opens", "java.base/sun.security.ssl=ALL-UNNAMED",
-            "--add-opens", "jdk.crypto.ec/sun.security.ec.ed=ALL-UNNAMED")
-
-    jvmArgs "-Dallure.listener=extensions.ManualTestListener"
+            "--add-opens", "jdk.crypto.ec/sun.security.ec.ed=ALL-UNNAMED"
+    ]
 
     testLogging {
         lifecycle {

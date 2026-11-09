@@ -1,6 +1,6 @@
 package api.specs.allMeters;
 
-import config.TestConfig;
+import base.TestData;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.ResponseSpecification;
 
@@ -13,13 +13,13 @@ public class AllMetersSpec {
     public static ResponseSpecification successfulAllMetersResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(200)
-            .expectBody(matchesJsonSchemaInClasspath(TestConfig.METERS_SUCCESS_SCHEMA))
+            .expectBody(matchesJsonSchemaInClasspath(TestData.METERS_SUCCESS_SCHEMA))
             .build();
 
     public static ResponseSpecification missingParametersResponseSpec = new ResponseSpecBuilder()
             .log(ALL)
             .expectStatusCode(400)
-            .expectBody(matchesJsonSchemaInClasspath(TestConfig.METERS_MISSING_SUCCESS_SCHEMA))
+            .expectBody(matchesJsonSchemaInClasspath(TestData.METERS_MISSING_SUCCESS_SCHEMA))
             .expectBody("success", equalTo(false))
             .expectBody("error", notNullValue())
             .build();

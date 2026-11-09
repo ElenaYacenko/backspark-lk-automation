@@ -31,4 +31,10 @@ public class TestData {
     public static final String DATE_START = "2026-04-01";
     public static final String DATE_END = "2026-11-01";
     public static final String ERROR_MISSING = "Отсутствует обязательный параметр";
+
+    // === Schema файлы ===
+    public static final String DEVICES_SUCCESS_SCHEMA = "schemas/devices/devices/devices_response-schema.json";
+    public static final String DEVICES_EMPTY_SUCCESS_SCHEMA = "schemas/devices/devices/empty_devices_response_schema.json";
+    public static final String METERS_SUCCESS_SCHEMA = "schemas/devices/allMeters/all-meters-response-schema.json";
+    public static final String METERS_MISSING_SUCCESS_SCHEMA = "schemas/devices/allMeters/missing-parameters-schema.json";
 }

@@ -15,6 +15,7 @@ import ui.pages.*;
 
 import java.util.Map;
 
+import static com.codeborne.selenide.Configuration.remote;
 import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.Selenide.webdriver;
 
@@ -50,9 +51,9 @@ public class UiTestBase extends ApiTestBase {
        // Configuration.browserVersion = System.getProperty("browserVersion", "156.0");
         Configuration.timeout = 10000;
 
-        String remote = System.getProperty("remote");
+        System.getProperty("selenide.remote");
         if (remote != null && !remote.isEmpty()) {
-            Configuration.remote = remote;
+            remote = remote;
             DesiredCapabilities capabilities = new DesiredCapabilities();
             capabilities.setCapability("selenoid:options", Map.<String, Object>of(
                     "enableVNC", true,
@@ -66,7 +67,7 @@ public class UiTestBase extends ApiTestBase {
         System.out.println("URL: " + Configuration.baseUrl);
         System.out.println("Browser: " + Configuration.browser);
         System.out.println("Browser size: " + Configuration.browserSize);
-        System.out.println("Remote: " + Configuration.remote);
+        System.out.println("Remote: " + remote);
 
         SelenideLogger.addListener(LISTENER_NAME, new AllureSelenide()
                 .savePageSource(true)
